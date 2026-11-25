@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Daily Stretch">
+<title>Daily Stretch Routine</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: calm, practical, a physio's pocket card — no hype.
+   IDEA: an exercise card from a physiotherapist, turned into a guided timer.
+   PICTURE: line-drawn figures that move through each exercise; the timer ring is the hero in the player.
+   COLOUR and TYPE: white + warm peach field, one cobalt accent; Outfit titles, Inter body.
+   LAYOUT: one column for the phone: today card, streak, calendar, routine list, settings. */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#121212);--ink:light-dark(#1b1a19,#f2efe9);--field:light-dark(#f7d7bf,#2f241d);--accent:light-dark(#2643e9,#93a5ff);--accentInk:light-dark(#ffffff,#0d1440);--muted:light-dark(#6b6762,#a8a199);--line:light-dark(#e8e2db,#2c2926);--soft:light-dark(#f6f3ef,#1c1b1a)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip;-webkit-tap-highlight-color:transparent}
+h1,h2,h3{font-family:Outfit,system-ui,sans-serif;margin:0;line-height:1.1;text-wrap:balance}
+h1{font-size:clamp(32px,8vw,44px);font-weight:700}h2{font-size:22px;font-weight:600;margin-bottom:12px}h3{font-size:17px;font-weight:600}
+.wrap{max-width:620px;margin:0 auto;padding:0 max(18px,env(safe-area-inset-left))}
+.top{background:var(--field);padding:calc(env(safe-area-inset-top) + 22px) 0 26px}
+.date{color:var(--ink);opacity:.7;font-size:14px;margin-bottom:6px}
+.status{margin:10px 0 18px;font-size:16px}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:color-mix(in srgb,var(--ink) 8%,transparent);border-radius:14px;padding:4px;margin-bottom:12px}
+.seg button{border:0;background:transparent;color:var(--ink);font:500 15px Inter,sans-serif;min-height:44px;border-radius:11px;cursor:pointer}
+.seg button.on{background:var(--bg);box-shadow:0 1px 3px #0002;font-weight:600}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:56px;border:0;border-radius:16px;font:600 18px Outfit,sans-serif;cursor:pointer}
+.go{background:var(--accent);color:var(--accentInk)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.ghost{background:var(--bg);color:var(--ink);font:600 16px Inter,sans-serif;min-height:50px;border:1.5px solid var(--line)}
+.ghost.on{border-color:var(--accent);color:var(--accent)}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+section{padding:26px 0;border-bottom:1px solid var(--line)}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.stat{background:var(--soft);border-radius:14px;padding:12px}
+.stat b{display:block;font:700 28px Outfit,sans-serif;line-height:1.1}.stat span{font-size:13px;color:var(--muted)}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;text-align:center}
+.cal .h{font-size:13px;color:var(--muted)}
+.day{aspect-ratio:1;border-radius:10px;border:1.5px solid var(--line);background:none;color:var(--ink);font:500 14px Inter,sans-serif;cursor:pointer;position:relative;padding:0}
+.day.done{background:var(--accent);border-color:var(--accent);color:var(--accentInk)}
+.day.ev::after{content:"";position:absolute;right:5px;top:5px;width:6px;height:6px;border-radius:50%;background:var(--accentInk)}
+.day.skip{background:repeating-linear-gradient(45deg,var(--soft) 0 4px,var(--line) 4px 8px);color:var(--muted)}
+.day.today{outline:2px solid var(--ink);outline-offset:1px}
+.day.fut{opacity:.3;pointer-events:none}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted);margin-top:10px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:5px}
+.grp{font-size:14px;color:var(--muted);margin:18px 0 6px}
+.ex{display:grid;grid-template-columns:60px minmax(0,1fr) auto;gap:12px;align-items:center;width:100%;background:none;border:0;border-top:1px solid var(--line);padding:8px 0;color:var(--ink);text-align:left;cursor:pointer;font:inherit}
+.ex svg{width:60px;height:60px;background:var(--soft);border-radius:12px}
+.ex small{color:var(--muted);font-size:13px;white-space:nowrap}
+.set{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.sw{appearance:none;width:52px;height:32px;border-radius:16px;background:var(--line);position:relative;cursor:pointer;flex:none;margin:0}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px #0003}
+.sw:checked{background:var(--accent)}.sw:checked::after{left:23px}
+select{font:16px Inter,sans-serif;min-height:40px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);padding:0 10px}
+.note{font-size:14px;color:var(--muted)}.note p{margin:0 0 8px}
+/* illustrations */
+.ill{display:block;color:var(--ink)}
+.ill .b{fill:none;stroke:currentColor;stroke-width:7;stroke-linecap:round;stroke-linejoin:round}
+.ill .hd{fill:currentColor;stroke:none}
+.ill .acc{stroke:var(--accent);fill:none;stroke-width:4;stroke-linecap:round}
+.ill .accf{fill:var(--accent);stroke:none;opacity:.55}
+.ill .flr{stroke:var(--line);stroke-width:3}
+.ill .wall{fill:var(--soft);stroke:none}
+.ill .gh{fill:none;stroke:var(--muted);stroke-width:3;stroke-dasharray:5 6}
+.ex .ill .b{stroke-width:9}
+/* overlays */
+.ov{position:fixed;inset:0;background:var(--bg);z-index:10;display:none;flex-direction:column;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 12px) 0 calc(env(safe-area-inset-bottom) + 16px)}
+.ov.open{display:flex}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.x{width:44px;height:44px;border-radius:50%;border:0;background:var(--soft);color:var(--ink);font-size:22px;cursor:pointer;flex:none}
+.prog{display:flex;gap:3px;margin:10px 0 4px}.prog i{flex:1;height:4px;border-radius:2px;background:var(--line)}.prog i.d{background:var(--accent)}
+.stage{background:var(--field);border-radius:22px;margin:10px 0;display:flex;justify-content:center}
+.stage svg{width:min(70vw,260px);height:min(70vw,260px)}
+.tline{display:flex;align-items:center;gap:16px;margin:8px 0}
+.ring{width:96px;height:96px;flex:none;position:relative}
+.ring svg{width:96px;height:96px;transform:rotate(-90deg)}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font:700 30px Outfit,sans-serif;font-variant-numeric:tabular-nums}
+.tag{font-size:13px;color:var(--muted)}
+.how{margin:8px 0 0;padding-left:20px}.how li{margin-bottom:4px}
+.ctrl{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:10px;margin-top:auto;padding-top:14px}
+.ctrl button{min-height:56px;border-radius:16px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);font:600 16px Inter,sans-serif;cursor:pointer}
+.ctrl .pp{background:var(--accent);color:var(--accentInk);border-color:var(--accent);font-size:18px}
+.next{font-size:14px;color:var(--muted);margin-top:10px}
+.why{background:var(--soft);border-radius:14px;padding:12px 14px;font-size:15px;margin-top:12px}
+.flash{color:var(--accent);font-weight:600}
+@media (prefers-reduced-motion:reduce){.sw::after{transition:none}}
+</style>
+</head>
+<body>
+<div class="top"><div class="wrap">
+  <div class="date" id="date"></div>
+  <h1 id="title">Morning routine</h1>
+  <div class="status" id="status"></div>
+  <div class="seg" role="tablist"><button id="mFull">Full · ~11 min</button><button id="mQuick">Quick · ~6 min</button></div>
+  <button class="btn go" id="start">Start routine</button>
+  <div class="row2"><button class="btn ghost" id="did">✓ I did it</button><button class="btn ghost" id="skip">Not today</button></div>
+</div></div>
+
+<div class="wrap">
+  <section><div class="stats">
+    <div class="stat"><b id="sStreak">0</b><span>day streak</span></div>
+    <div class="stat"><b id="sWeek">0/7</b><span>this week</span></div>
+    <div class="stat"><b id="sTotal">0</b><span>total days</span></div>
+  </div></section>
+
+  <section>
+    <h2>Last 5 weeks</h2>
+    <div class="cal" id="cal"></div>
+    <div class="legend"><span><i style="background:var(--accent)"></i>Done (dot = evening)</span><span><i style="background:var(--line)"></i>Skipped</span><span>Tap a day to change it</span></div>
+  </section>
+
+  <section>
+    <h2>The routine</h2>
+    <div id="list"></div>
+  </section>
+
+  <section>
+    <h2>Settings</h2>
+    <label class="set"><span>Voice guidance</span><input type="checkbox" class="sw" id="oVoice"></label>
+    <label class="set"><span>Beeps (last 3 seconds)</span><input type="checkbox" class="sw" id="oBeep"></label>
+    <label class="set"><span>Get-ready time between exercises</span><select id="oReady"><option value="3">3 s</option><option value="5">5 s</option><option value="10">10 s</option></select></label>
+    <p class="note">Sounds won't play if your iPhone is on silent.</p>
+  </section>
+
+  <section class="note" style="border:0">
+    <h3 style="color:var(--ink);margin-bottom:8px">Good to know</h3>
+    <p>Stretches should feel like gentle tension, never pain. Stop if you feel tingling, numbness, dizziness or sharp pain, and see a physio or doctor if neck pain lasts or spreads down your arm.</p>
+    <p>The posture part is the best-supported: chin tucks (deep neck flexor training) plus chest stretches are the standard core of forward-head-posture programmes. The "lymphatic" part is honest movement: breathing and calf work genuinely move fluid, but no 3-minute routine "detoxes" you. Its real value is waking the body up.</p>
+    <p>Progress is saved on this phone, in this browser only.</p>
+  </section>
+</div>
+
+<div class="ov" id="player"><div class="wrap" style="display:flex;flex-direction:column;flex:1;width:100%">
+  <div class="bar"><span class="tag" id="pSec"></span><button class="x" id="pClose" aria-label="Close">×</button></div>
+  <div class="prog" id="pProg"></div>
+  <div id="pBody" style="display:flex;flex-direction:column;flex:1"></div>
+</div></div>
+
+<div class="ov" id="detail"><div class="wrap" style="width:100%">
+  <div class="bar"><span class="tag" id="dSec"></span><button class="x" id="dClose" aria-label="Close">×</button></div>
+  <div id="dBody"></div>
+</div></div>
+
+<script>
+{
+const F=(inner,extra='')=>`<svg class="ill" viewBox="0 0 200 200" aria-hidden="true">${extra}<line class="flr" x1="14" y1="190" x2="186" y2="190"/><g class="b">${inner}</g></svg>`;
+const A=(attr,vals,dur,more='')=>`<animate attributeName="${attr}" values="${vals}" dur="${dur}" repeatCount="indefinite" ${more}/>`;
+const T=(type,vals,dur,more='')=>`<animateTransform attributeName="transform" type="${type}" values="${vals}" dur="${dur}" repeatCount="indefinite" ${more}/>`;
+
+const SVG={
+breath:()=>F(`<circle class="hd" cx="100" cy="36" r="15"/><path d="M100,54 L100,122 L100,186"/><path d="M100,70 L86,96 L108,104"/>
+ <ellipse class="accf" cx="110" cy="104" rx="5" ry="14">${A('rx','4;14;14;4','10s','keyTimes="0;0.4;0.45;1"')}</ellipse>`),
+collar:()=>F(`<circle class="hd" cx="100" cy="34" r="15"/><path d="M100,50 L100,124 L86,186 M100,124 L114,186 M72,66 L128,66 M72,66 L62,100 M128,66 L138,100"/>
+ <g>${T('translate','0,0;5,4;0,0','1.4s')}<path d="M62,100 L88,72"/></g><g>${T('translate','0,0;-5,4;0,0','1.4s')}<path d="M138,100 L112,72"/></g>
+ <circle class="accf" cx="88" cy="70" r="6"/><circle class="accf" cx="112" cy="70" r="6"/>`),
+heel:()=>F(`<g>${T('translate','0,0;0,-11;0,-11;0,0','2.6s','keyTimes="0;0.35;0.5;1"')}<circle class="hd" cx="100" cy="36" r="15"/><path d="M100,54 L100,122 L100,186 M100,70 L94,104 L98,124"/></g>
+ <path d="M100,186 L124,188">${A('d','M100,186 L124,188;M100,175 L124,188;M100,175 L124,188;M100,186 L124,188','2.6s','keyTimes="0;0.35;0.5;1"')}</path>`),
+circles:()=>F(`<circle class="hd" cx="100" cy="34" r="15"/><path d="M100,50 L100,124 L86,186 M100,124 L114,186 M100,66 L38,66 M100,66 L162,66"/>`,
+ `<circle class="acc" cx="38" cy="66" r="12" stroke-dasharray="4 5"/><circle class="acc" cx="162" cy="66" r="12" stroke-dasharray="4 5"/>
+ <circle class="accf" r="6" style="opacity:1"><animateMotion dur="1.2s" repeatCount="indefinite" path="M38,54 a12,12 0 1,1 0,24 a12,12 0 1,1 0,-24"/></circle>
+ <circle class="accf" r="6" style="opacity:1"><animateMotion dur="1.2s" repeatCount="indefinite" path="M162,54 a12,12 0 1,0 0,24 a12,12 0 1,0 0,-24"/></circle>`),
+catcow:()=>F(`<circle class="hd" cx="44" cy="124" r="13">${A('cy','118;140;118','7s')}</circle>
+ <path d="M60,130 Q100,100 140,130">${A('d','M60,130 Q100,100 140,130;M60,130 Q100,154 140,130;M60,130 Q100,100 140,130','7s')}</path>
+ <path d="M60,130 L60,186 M140,130 L140,186 L180,186"/>`),
+side:()=>F(`<path d="M100,124 L86,186 M100,124 L114,186"/><g>${T('rotate','0 100 124;-17 100 124;-17 100 124;0 100 124;17 100 124;17 100 124;0 100 124','10s')}
+ <circle class="hd" cx="100" cy="36" r="15"/><path d="M100,52 L100,124 M100,66 L80,40 L96,12 M100,66 L120,40 L104,12"/></g>`),
+lunge:()=>F(`<g>${T('translate','0,0;-6,0;0,0','5s')}<circle class="hd" cx="111" cy="56" r="15"/><path d="M112,74 L116,138 M114,88 L102,112 L116,130"/></g>
+ <path d="M116,138 L66,142 L64,186 L46,186 M116,138 L150,186 L186,186"/><path class="acc" d="M124,146 Q136,156 142,170"/>`),
+fold:()=>F(`<path d="M112,186 L112,110"/><g>${T('rotate','-5 112 110;5 112 110;-5 112 110','6s')}
+ <path d="M112,110 L94,152 M94,152 L84,172 L88,184"/><circle class="hd" cx="100" cy="170" r="13"/></g><path class="acc" d="M122,120 L122,176"/>`),
+chin:()=>F(`<path d="M30,178 L170,178"/><path d="M96,122 L92,176"/>
+ <g class="gh"><circle cx="112" cy="80" r="34" style="fill:none;stroke:var(--muted);stroke-width:3"/></g>
+ <g>${T('translate','12,0;0,0;0,0;12,0','4s','keyTimes="0;0.25;0.75;1"')}<circle class="hd" cx="100" cy="80" r="34"/><path class="hd" d="M132,76 L144,92 L130,94Z"/><circle cx="118" cy="72" r="4" style="fill:var(--bg);stroke:none"/></g>
+ <path class="acc" d="M150,40 L112,40 M122,32 L112,40 L122,48"/>`),
+trap:()=>F(`<path d="M100,124 L86,186 M100,124 L114,186 M100,58 L100,124 M72,68 L128,68 M72,68 L66,126"/>
+ <g>${T('rotate','16 100 62;24 100 62;16 100 62','5s')}<circle class="hd" cx="100" cy="36" r="15"/><path d="M128,68 L142,34 L104,16"/></g>
+ <path class="acc" d="M76,62 Q86,52 94,48"/>`),
+door:()=>F(`<path d="M128,8 L128,190" style="stroke:var(--muted);stroke-width:5"/>
+ <g>${T('translate','0,0;-6,0;0,0','5s')}<circle class="hd" cx="94" cy="48" r="15"/><path d="M98,66 L110,122 M100,74 L126,76 L126,46"/><path class="acc" d="M88,82 Q84,96 90,108"/></g>
+ <path d="M110,122 L84,186 M110,122 L122,186"/>`),
+angels:()=>F(`<circle class="hd" cx="100" cy="34" r="15"/><path d="M100,50 L100,124 L86,186 M100,124 L114,186 M76,66 L124,66"/>
+ <path d="M76,66 L50,86 L48,54">${A('d','M76,66 L50,86 L48,54;M76,66 L60,38 L70,10;M76,66 L50,86 L48,54','6s')}</path>
+ <path d="M124,66 L150,86 L152,54">${A('d','M124,66 L150,86 L152,54;M124,66 L140,38 L130,10;M124,66 L150,86 L152,54','6s')}</path>`,
+ `<rect class="wall" x="24" y="4" width="152" height="186" rx="6"/>`)
+};
+
+const EX={
+breath:{n:'Belly breathing',sec:'Wake up the body',dur:60,cue:'Slow belly breaths. In for 4, out for 6.',
+ how:['Stand tall, one hand on your belly.','Breathe in through the nose for 4 counts: the belly pushes out, the chest stays quiet.','Breathe out slowly for 6 counts.'],
+ why:'The diaphragm acts like a pump: as it moves, pressure in the chest and abdomen changes, which helps push lymph and venous blood back toward the heart. It also calms the nervous system.'},
+collar:{n:'Collarbone pumps',sec:'Wake up the body',dur:30,cue:'Very light strokes above the collarbones, down and out.',
+ how:['Place your fingertips in the hollows just above your collarbones.','Use very light pressure, just enough to move the skin.','Stroke gently down and out toward your shoulders, in a slow rhythm.'],
+ why:'This is where lymph drains back into the bloodstream, so lymphatic self-massage routines usually start here. Pressure must stay light: lymph vessels sit just under the skin.'},
+heel:{n:'Heel raises',sec:'Wake up the body',dur:45,reps:'About 20 slow reps',cue:'Rise onto your toes, pause, lower slowly.',
+ how:['Feet hip-width apart, a hand on a wall for balance if needed.','Rise onto your toes, pause one second at the top.','Lower slowly. Keep going until the timer ends.'],
+ why:'Your calves are the body\'s "second heart": each contraction squeezes the veins and lymph vessels in the lower legs and pushes fluid upward.'},
+circles:{n:'Arm circles',sec:'Wake up the body',dur:30,sides:true,sw:'Switch direction',cue:'Small circles forward, then backward.',
+ how:['Arms straight out at shoulder height.','Make small, controlled circles forward.','At the signal, switch to backward circles.'],
+ why:'Warms up the shoulders and gets the muscles around the armpits moving, a major lymph node area.'},
+catcow:{n:'Cat–cow',sec:'Morning stretch',dur:45,cue:'Round the back as you breathe out, lift the chest as you breathe in.',
+ how:['On hands and knees: hands under shoulders, knees under hips.','Breathe out: round your back up, chin toward chest.','Breathe in: let the belly drop, lift chest and gaze. Move slowly, 6 to 8 rounds.'],
+ why:'Moves the whole spine gently through flexion and extension, a good way to undo the stiffness of the night.'},
+side:{n:'Standing side bend',sec:'Morning stretch',dur:40,sides:true,cue:'Arms overhead, lean to one side, hips stay still.',
+ how:['Stand with feet hip-width, arms overhead, hands together.','Lean to one side, reaching long, without twisting or leaning forward.','Breathe into the stretched side. Switch at the signal.'],
+ why:'Stretches the sides of the trunk and the lats, which get tight from sitting and phone use.'},
+lunge:{n:'Kneeling hip flexor stretch',sec:'Morning stretch',dur:60,sides:true,cue:'Tuck the pelvis, squeeze the back glute, shift forward a little.',
+ how:['Kneel on one knee (use a cushion), other foot in front.','Tuck your tailbone under and squeeze the glute of the back leg.','Shift your hips forward until you feel a stretch at the front of the back hip. Keep your chest tall. Switch at the signal.'],
+ why:'Hours of sitting keep the hip flexors short, which tilts the pelvis and the whole posture chain above it.'},
+fold:{n:'Forward fold',sec:'Morning stretch',dur:40,cue:'Knees soft, hang heavy, let the head go.',
+ how:['Feet hip-width, knees slightly bent.','Fold forward from the hips and let the upper body hang.','Gently nod yes and no to relax the neck. Roll up slowly, head last.'],
+ why:'Lengthens the hamstrings and the back of the body and lets the neck fully relax.'},
+chin:{n:'Chin tucks',sec:'Neck posture',dur:45,reps:'10 reps, hold 3 s each',cue:'Glide the chin straight back, hold 3 seconds, release.',
+ how:['Sit or stand tall, eyes level.','Glide your chin straight back, as if making a double chin. Don\'t tilt your head down.','Hold 3 seconds, release. Repeat 10 times.'],
+ why:'This trains the deep neck flexors, which weaken with forward head posture. It is the core exercise in most clinical programmes for "tech neck".'},
+trap:{n:'Upper trapezius stretch',sec:'Neck posture',dur:60,sides:true,cue:'Ear toward the shoulder, the other shoulder stays down.',
+ how:['Sit tall and hold the edge of the chair with one hand to keep that shoulder down.','Tilt your ear toward the opposite shoulder.','Rest your other hand lightly on your head. Let its weight do the work, never pull. Switch at the signal.'],
+ why:'Releases the muscles on top of the shoulders that tighten when the head sits forward.'},
+door:{n:'Doorway chest stretch',sec:'Neck posture',dur:45,cue:'Forearms on the frame, step through gently.',
+ how:['Stand in a doorway, forearms on the frame, elbows at shoulder height.','Step one foot forward until you feel a stretch across the chest.','Keep your ribs down: don\'t arch your lower back.'],
+ why:'A tight chest pulls the shoulders forward, and the head follows. Pec stretches are part of nearly every posture-correction programme.'},
+angels:{n:'Wall angels',sec:'Neck posture',dur:60,reps:'8–10 slow reps',cue:'Back to the wall, slide arms from W up to Y and back.',
+ how:['Stand with heels a few cm from a wall; back, head and backside against it.','Arms in a W, backs of hands toward the wall.','Slide up into a Y and back down slowly. Keep as much contact as you comfortably can; if your head can\'t touch the wall without tilting up, just keep it close.'],
+ why:'Strengthens the muscles between the shoulder blades and trains the "shoulders back, head back" position.'}
+};
+
+const ROUT={full:[['breath'],['collar'],['heel'],['circles'],['catcow'],['side'],['lunge'],['fold'],['chin'],['trap'],['door'],['angels']],
+ quick:[['breath',45],['heel',40],['catcow',40],['chin',45],['trap',50],['door',40],['angels',45]]};
+
+const $=id=>document.getElementById(id);
+let S={log:{},mode:'full',voice:true,beep:true,ready:5};
+try{Object.assign(S,JSON.parse(localStorage.getItem('stretch.v1')||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem('stretch.v1',JSON.stringify(S))}catch(e){}};
+const key=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const today=()=>key(new Date());
+const slot=()=>new Date().getHours()<14?'morning':'evening';
+const list=()=>ROUT[S.mode].map(([id,d])=>({id,...EX[id],dur:d||EX[id].dur}));
+
+function streak(){let d=new Date(),n=0;if(S.log[key(d)]?.s!=='done')d.setDate(d.getDate()-1);while(S.log[key(d)]?.s==='done'){n++;d.setDate(d.getDate()-1)}return n}
+
+function render(){
+  const now=new Date(),t=S.log[today()],sl=slot();
+  $('date').textContent=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+  $('title').textContent=sl==='morning'?'Morning routine':'Evening catch-up';
+  $('status').innerHTML=t?.s==='done'?`<span class="flash">Done today ✓</span> (${t.t})`:t?.s==='skip'?'Marked as skipped today.':sl==='morning'?'Not done yet. About 10 minutes to start the day right.':'Didn\'t make it this morning? Do it now, the routine works just as well tonight.';
+  $('mFull').classList.toggle('on',S.mode==='full');$('mQuick').classList.toggle('on',S.mode==='quick');
+  $('did').classList.toggle('on',t?.s==='done');$('skip').classList.toggle('on',t?.s==='skip');
+  $('did').textContent=t?.s==='done'?'✓ Done (undo)':'✓ I did it';
+  $('skip').textContent=t?.s==='skip'?'Skipped (undo)':'Not today';
+  const st=streak();$('sStreak').textContent=st;
+  const mon=new Date(now);mon.setDate(now.getDate()-((now.getDay()+6)%7));let w=0;
+  for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(mon.getDate()+i);if(S.log[key(d)]?.s==='done')w++}
+  $('sWeek').textContent=w+'/7';
+  $('sTotal').textContent=Object.values(S.log).filter(x=>x.s==='done').length;
+  const start=new Date(mon);start.setDate(mon.getDate()-28);let h=['M','T','W','T','F','S','S'].map(x=>`<div class="h">${x}</div>`).join('');
+  for(let i=0;i<35;i++){const d=new Date(start);d.setDate(start.getDate()+i);const k=key(d),e=S.log[k];
+    const c=['day',e?.s==='done'?'done':'',e?.s==='done'&&e.t==='evening'?'ev':'',e?.s==='skip'?'skip':'',k===today()?'today':'',d>now&&k!==today()?'fut':''].join(' ');
+    h+=`<button class="${c}" data-k="${k}" aria-label="${d.toDateString()}">${d.getDate()}</button>`}
+  $('cal').innerHTML=h;
+  let L='',sec='';
+  list().forEach((x,i)=>{if(x.sec!==sec){sec=x.sec;L+=`<div class="grp">${sec}</div>`}
+    L+=`<button class="ex" data-i="${x.id}">${SVG[x.id]()}<span><h3>${x.n}</h3><span class="tag">${x.reps||(x.sides?(x.sw||'Both sides'):'Hold / flow')}</span></span><small>${x.dur} s</small></button>`});
+  $('list').innerHTML=L;
+  const tot=list().reduce((a,x)=>a+x.dur+S.ready,0);
+  $('start').textContent=`Start · ${Math.round(tot/60)} min`;
+  $('oVoice').checked=S.voice;$('oBeep').checked=S.beep;$('oReady').value=String(S.ready);
+}
+
+function mark(s){const k=today();if(S.log[k]?.s===s)delete S.log[k];else S.log[k]={s,t:slot(),m:S.mode};save();render()}
+$('did').onclick=()=>mark('done');$('skip').onclick=()=>mark('skip');
+$('mFull').onclick=()=>{S.mode='full';save();render()};$('mQuick').onclick=()=>{S.mode='quick';save();render()};
+$('oVoice').onchange=e=>{S.voice=e.target.checked;save()};$('oBeep').onchange=e=>{S.beep=e.target.checked;save()};
+$('oReady').onchange=e=>{S.ready=+e.target.value;save();render()};
+$('cal').onclick=e=>{const b=e.target.closest('.day');if(!b)return;const k=b.dataset.k,c=S.log[k]?.s;
+  if(!c)S.log[k]={s:'done',t:'morning',m:S.mode};else if(c==='done'&&S.log[k].t==='morning')S.log[k].t='evening';else if(c==='done')S.log[k]={s:'skip'};else delete S.log[k];save();render()};
+$('list').onclick=e=>{const b=e.target.closest('.ex');if(!b)return;const x=list().find(y=>y.id===b.dataset.i);
+  $('dSec').textContent=x.sec;$('dBody').innerHTML=`<div class="stage">${SVG[x.id]()}</div><h2>${x.n}</h2><div class="tag">${x.dur} s · ${x.reps||(x.sides?'both sides':'hold / flow')}</div><ol class="how">${x.how.map(s=>`<li>${s}</li>`).join('')}</ol><div class="why"><b>Why:</b> ${x.why}</div>`;
+  $('detail').classList.add('open')};
+$('dClose').onclick=()=>$('detail').classList.remove('open');
+
+/* audio + voice */
+let AC=null;
+function beep(f=880,d=.12){if(!S.beep)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime;o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.3,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+.05)}catch(e){}}
+function say(s){if(!S.voice)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(s);u.lang='en-US';u.rate=.98;speechSynthesis.speak(u)}catch(e){}}
+let lock=null;async function wake(on){try{if(on&&navigator.wakeLock)lock=await navigator.wakeLock.request('screen');else if(lock){lock.release();lock=null}}catch(e){}}
+
+/* player */
+let P=null,timer=null;
+const R=42,C=2*Math.PI*R;
+function startRoutine(){
+  beep(660,.05);say('Let\'s begin.');
+  P={L:list(),i:0,phase:S.ready?'ready':'go',paused:false,last:Date.now(),half:false};
+  setPhase();$('player').classList.add('open');wake(true);
+  clearInterval(timer);timer=setInterval(tick,200);
+}
+function setPhase(){const x=P.L[P.i];P.total=P.left=P.phase==='ready'?S.ready:x.dur;P.whole=Math.ceil(P.left);P.half=false;
+  if(P.phase==='go'){beep(990,.25);say(x.n+'. '+x.cue)}else if(P.i>0)say('Next: '+x.n);drawPlayer()}
+function drawPlayer(){const x=P.L[P.i],nx=P.L[P.i+1],r=P.phase==='ready';
+  $('pSec').textContent=`${x.sec} · ${P.i+1} of ${P.L.length}`;
+  $('pProg').innerHTML=P.L.map((_,j)=>`<i class="${j<P.i||(j===P.i&&!r)?'d':''}"></i>`).join('');
+  $('pBody').innerHTML=`<div class="stage">${SVG[x.id]()}</div>
+  <div class="tline"><div class="ring"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="${R}" fill="none" stroke="var(--line)" stroke-width="7"/><circle id="arc" cx="48" cy="48" r="${R}" fill="none" stroke="var(--accent)" stroke-width="7" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="0"/></svg><b id="num"></b></div>
+  <div><div class="tag">${r?'Get ready':(x.reps||(x.sides?'Both sides':'Keep going'))}</div><h2 style="margin:2px 0 0">${x.n}</h2><div class="flash" id="side"></div></div></div>
+  <ol class="how">${x.how.map(s=>`<li>${s}</li>`).join('')}</ol>
+  <div class="next">${nx?'Next: '+nx.n:'Last one!'}</div>
+  <div class="ctrl"><button id="bPrev">‹ Back</button><button class="pp" id="bPP">${P.paused?'Resume':'Pause'}</button><button id="bNext">Skip ›</button></div>`;
+  $('bPrev').onclick=()=>{if(P.phase==='go'&&P.total-P.left>3){P.phase='go'}else if(P.i>0){P.i--;P.phase='go'}setPhase()};
+  $('bNext').onclick=()=>advance();
+  $('bPP').onclick=()=>{P.paused=!P.paused;P.last=Date.now();$('bPP').textContent=P.paused?'Resume':'Pause';if(P.paused)try{speechSynthesis.cancel()}catch(e){}};
+  upd()}
+function upd(){const n=$('num'),a=$('arc');if(!n)return;n.textContent=Math.max(0,Math.ceil(P.left));a.setAttribute('stroke-dashoffset',String(C*(1-P.left/P.total)));
+  const x=P.L[P.i];if(x.sides&&P.phase==='go')$('side').textContent=P.half?(x.sw?'Backward':'Second side'):(x.sw?'Forward':'First side')}
+function advance(){if(P.phase==='ready'){P.phase='go'}else if(P.i<P.L.length-1){P.i++;P.phase=S.ready?'ready':'go'}else return finish();setPhase()}
+function tick(){if(!P||P.paused){if(P)P.last=Date.now();return}
+  const now=Date.now();P.left-=(now-P.last)/1000;P.last=now;
+  const w=Math.ceil(P.left);if(w!==P.whole){P.whole=w;if(w>0&&w<=3)beep(P.phase==='ready'?660:880)}
+  const x=P.L[P.i];if(x.sides&&P.phase==='go'&&!P.half&&P.left<=P.total/2){P.half=true;beep(1200,.3);say(x.sw||'Switch sides')}
+  if(P.left<=0)return advance();upd()}
+function finish(){clearInterval(timer);wake(false);S.log[today()]={s:'done',t:slot(),m:S.mode};save();render();beep(990,.15);setTimeout(()=>beep(1320,.3),180);say('Well done. See you tomorrow.');
+  $('pProg').innerHTML=P.L.map(()=>'<i class="d"></i>').join('');
+  $('pBody').innerHTML=`<div class="stage" style="padding:40px 20px;text-align:center;display:block"><h1>Done ✓</h1><p style="margin:10px 0 0">Saved for this ${slot()}. Streak: <b>${streak()} day${streak()===1?'':'s'}</b>.</p></div><div class="ctrl" style="grid-template-columns:1fr"><button class="pp" id="bHome">Back to home</button></div>`;
+  $('bHome').onclick=closeP;P=null}
+function closeP(){clearInterval(timer);P=null;wake(false);try{speechSynthesis.cancel()}catch(e){}$('player').classList.remove('open')}
+$('start').onclick=startRoutine;$('pClose').onclick=closeP;
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&P)wake(true)});
+render();
+}
+</script>
+</body>
+</html>
